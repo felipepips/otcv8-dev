@@ -90,12 +90,15 @@ void Outfit::draw(Point dest, Otc::Direction direction, uint walkAnimationPhase,
             } else {
                 animationPhase = idleAnimator->getPhase();
             }
-        } else if (type->isAnimateAlways() || ui) {
+        } else if (type->isAnimateAlways() || ui) { // by F.Almeida
             int phases = type->getAnimator() ? type->getAnimator()->getAnimationPhases() : type->getAnimationPhases();
-            if (ui && phases < 4) {
-                phases = 2; // old protocols with 2 frames walk animation
+            // if (ui && phases < 4) {
+            //     phases = 2; // old protocols with 2 frames walk animation
+            if (ui) {
+                phases = phases - (phases % 2);
             }
-            int ticksPerFrame = !g_game.getFeature(Otc::GameEnhancedAnimations) ? 333 : (1000 / phases);
+            // int ticksPerFrame = !g_game.getFeature(Otc::GameEnhancedAnimations) ? 333 : (1000 / phases);
+            int ticksPerFrame = (700 / phases); // by F.Almeida
             animationPhase = (g_clock.millis() % (ticksPerFrame * phases)) / ticksPerFrame;
             if (idleAnimator && ui) {
                 animationPhase += idleAnimator->getAnimationPhases() - 1;
@@ -137,7 +140,9 @@ void Outfit::draw(Point dest, Otc::Direction direction, uint walkAnimationPhase,
             }
             else if (ui && animate) {
                 int phases = mountType->getAnimator() ? mountType->getAnimator()->getAnimationPhases() : mountType->getAnimationPhases();
-                int ticksPerFrame = 1000 / phases;
+                phases = phases - (phases % 2); // by F.Almeida
+                // int ticksPerFrame = 1000 / phases;
+                int ticksPerFrame = 700 / phases;
                 mountAnimationPhase = (g_clock.millis() % (ticksPerFrame * phases)) / ticksPerFrame;
                 if (!mountType->isAnimateAlways()) {
                     mountAnimationPhase += 1;
