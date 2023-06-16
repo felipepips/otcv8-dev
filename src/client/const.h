@@ -489,6 +489,9 @@ namespace Otc
         GameItemCustomAttributes = 126,
         GameAnimatedTextCustomFont = 127,
 
+        // Custom by F.Almeida (Force using 10+ style dat)
+        GameNewerDatVersion = 128,
+
         LastGameFeature = 130
     };
 
