@@ -271,7 +271,7 @@ function mainLoop()
   local now = g_clock.seconds()
 
   -- anti idle
-  if set.checkIdle and (lastEat + config.turnInterval < now) then
+  if set.checkIdle and (lastTurn + config.turnInterval < now) then
     lastTurn = now
     local dir = player:getDirection()
     dir = dir > 5 and 3 or (dir > 3 and 1 or dir)
