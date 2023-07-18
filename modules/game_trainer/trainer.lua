@@ -2,8 +2,9 @@ local config = {
   checkBlanks = true, -- check if player have blank runes to conjure runes
   blankId = 3147,
   checkSoul = true, -- check if player have enough soul to conjure runes
-  loopInterval = 5, -- seconds, check mana to make runes
+  loopInterval = 5, -- seconds, main loop interval / check mana to make runes & cast spell
   eatInterval = 30, -- seconds, search for food interval
+  turnInterval = 5 * 60, -- seconds, anti-idle/change direction interval
   defaultSayChannel = 1, -- channel id
   useHotkey = true, -- if your server doesn't allow using items thru hotkeys, set to false // if false, it will search for food only in opened containers
 }
@@ -19,9 +20,7 @@ local customSoul = { -- spell soul info taken from modules\gamelib\spells.lua, b
   ['adori gran'] = 3,
   ['adori gran flam'] = 4,
 }
-
 -- CONFIG END
-local lastSoul = 0 -- if we dont find information about any conjureSpell, we're going to calculate previous vs current soul and consider as required.
 
 
 tWindow = nil
@@ -243,6 +242,7 @@ function say(text)
   g_game.talkChannel(defaultSayChannel,0,text)
 end
 
+local lastSoul = 0 -- if we dont find information about any conjureSpell, we're going to calculate previous vs current soul and consider as required.
 function getSpellSoul(spell,pSoul)
   local custom = customSoul[spell:lower()]
   if custom then
@@ -259,7 +259,7 @@ function getSpellSoul(spell,pSoul)
 end
 
 local lastEat = 0
-
+local lastTurn = 0
 -- execute
 function mainLoop()
   if not g_game.isOnline() or not tSettings.enabled then
@@ -268,15 +268,22 @@ function mainLoop()
   end
   local player = g_game.getLocalPlayer()
   local set = tSettings
+  local now = g_clock.seconds()
 
   -- anti idle
   if set.checkIdle then
-    g_game.turn(math.random(0,3))
+    local dir = player:getDirection()
+    dir = dir > 5 and 3 or (dir > 3 and 1 or dir)
+    local newDir = dir
+    while newDir == dir do
+      newDir = math.random(0,3)
+    end
+    g_game.turn(newDir)
   end
 
   -- eat food
-  if set.checkFood and (lastEat + config.eatInterval < g_clock.seconds()) then
-    lastEat = g_clock.seconds()
+  if set.checkFood and (lastEat + config.eatInterval < now) then
+    lastEat = now
     if config.useHotkey then
       for _, id in pairs(foodIds) do
         if player:getItemsCount(id) > 0 then
