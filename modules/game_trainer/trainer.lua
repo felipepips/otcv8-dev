@@ -39,7 +39,7 @@ function init()
   tWindow:disableResize()
   tWindow:setup()
 
-  tButton = modules.client_topmenu.addRightGameToggleButton('trainer', tr('Trainer'), '/images/topButtons/inventory', toggleWindow)
+  tButton = modules.client_topmenu.addRightGameToggleButton('trainer', tr('Trainer'), '/images/topbuttons/inventory', toggleWindow)
   tButton:setOn(tWindow:isVisible())
 
   if g_game.isOnline() then
